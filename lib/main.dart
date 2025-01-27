@@ -1,13 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/features/auth/pages/sign_up_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/features/auth/cubit/auth_cubit.dart';
+import 'package:frontend/features/auth/pages/sign_in_page.dart';
+import 'package:frontend/features/home/pages/home_page.dart';
 import 'package:frontend/ui/components/configuration_theme.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => AuthCubit()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<AuthCubit>().getUser();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +45,15 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamilyFallback: ['Poppins'],
       ),
-      home: const SignUpPage(),
+      // ! kalo ga butuh listener / ga butuh untuk kasih snackbar, bisa pake BlocBuilder
+      home: BlocBuilder<AuthCubit, AuthState>(
+        builder: (context, state) {
+          if (state is AuthLoggedIn) {
+            return const HomePage();
+          }
+          return const SignInPage();
+        },
+      ),
       debugShowCheckedModeBanner: false,
     );
   }
