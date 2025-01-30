@@ -9,7 +9,7 @@ part 'auth_state.dart';
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(const AuthInitial());
   final AuthRemoteRepository _authRemoteRepository = AuthRemoteRepository();
-  void register({
+  Future<void> register({
     required String name,
     required String email,
     required String password,
@@ -25,37 +25,42 @@ class AuthCubit extends Cubit<AuthState> {
         ),
       );
     } catch (e) {
-      LogService.e(e.toString());
       emit(AuthError(e.toString()));
     }
   }
 
-  void login({required String email, required String password}) async {
+  Future<void> login({required String email, required String password}) async {
     try {
       emit(AuthLoading());
       final res =
           await _authRemoteRepository.login(email: email, password: password);
-      emit(AuthLogin(res.data ?? UserModel.defaultUser(), res.message));
+      if (res is ApiSuccess && res.data != null) {
+        emit(AuthLogin(
+          // ! gapapa pakai null safety karena sudah di cek di atas
+          res.data!,
+        ));
+      } else {
+        emit(AuthError(res.message));
+      }
     } catch (e) {
-      LogService.e(e.toString());
       emit(AuthError(e.toString()));
     }
   }
 
-  void getUser() async {
+  Future<void> getUser() async {
     try {
-      emit(AuthLoading());
       final res = await _authRemoteRepository.getUser();
-      if (res is ApiSuccess) {
-        emit(AuthLoggedIn(
-          res?.data ?? UserModel.defaultUser(),
+      if (res is ApiSuccess && res?.data != null) {
+        emit(AuthLogin(
+          // ! gapapa pake as karena sudah pasti UserModel
+          res?.data as UserModel,
         ));
       } else {
         emit(AuthInitial());
       }
     } catch (e) {
       LogService.e(e.toString());
-      emit(AuthError(e.toString()));
+      emit(AuthInitial());
     }
   }
 

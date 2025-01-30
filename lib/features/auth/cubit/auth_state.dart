@@ -17,13 +17,7 @@ final class AuthSignUp extends AuthState {
 
 final class AuthLogin extends AuthState {
   final UserModel user;
-  final String message;
-  const AuthLogin(this.user, this.message);
-}
-
-final class AuthLoggedIn extends AuthState {
-  final UserModel user;
-  const AuthLoggedIn(this.user);
+  const AuthLogin(this.user);
 }
 
 final class LoggedOut extends AuthState {

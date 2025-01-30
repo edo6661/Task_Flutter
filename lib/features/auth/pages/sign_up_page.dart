@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/core/common/extent.dart';
-import 'package:frontend/core/utils/log_service.dart';
 import 'package:frontend/features/auth/cubit/auth_cubit.dart';
 import 'package:frontend/features/auth/pages/sign_in_page.dart';
 import 'package:frontend/ui/components/center_circular_loading.dart';
@@ -27,9 +26,9 @@ class _SignUpPageState extends State<SignUpPage> {
   bool obscurePassword = false;
   String? passwordError;
 
-  void signUp() {
+  void signUp() async {
     if (formKey.currentState!.validate()) {
-      context.read<AuthCubit>().register(
+      await context.read<AuthCubit>().register(
           name: nameController.text.trim(),
           email: emailController.text.trim(),
           password: passwordController.text.trim());
@@ -52,11 +51,7 @@ class _SignUpPageState extends State<SignUpPage> {
         )));
       }
       if (state is AuthSignUp) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: MainText(
-          text: "${state.message} ${state.user.name}",
-          color: Colors.white,
-        )));
+        Navigator.of(context).push(SignInPage.route());
       }
     },
             // ! Tujuan: Builder digunakan untuk membangun ulang UI ketika ada perubahan pada data atau state.
@@ -87,18 +82,19 @@ class _SignUpPageState extends State<SignUpPage> {
                             }
                             return null;
                           },
+                          isEnabled: (state is! AuthLoading),
                         ),
                         MainTextField(
-                          controller: emailController,
-                          hintText: "Email",
-                          leadingIcon: Icon(Icons.email),
-                          validator: (val) {
-                            if (val!.isEmpty) {
-                              return "Email cannot be empty";
-                            }
-                            return null;
-                          },
-                        ),
+                            controller: emailController,
+                            hintText: "Email",
+                            leadingIcon: Icon(Icons.email),
+                            validator: (val) {
+                              if (val!.isEmpty) {
+                                return "Email cannot be empty";
+                              }
+                              return null;
+                            },
+                            isEnabled: (state is! AuthLoading)),
                         MainTextField(
                           controller: passwordController,
                           hintText: "Password",
@@ -115,6 +111,13 @@ class _SignUpPageState extends State<SignUpPage> {
                                     : Icons.visibility,
                               )),
                           obscureText: !obscurePassword,
+                          isEnabled: (state is! AuthLoading),
+                          validator: (val) {
+                            if (val!.isEmpty) {
+                              return "Password cannot be empty";
+                            }
+                            return null;
+                          },
                         ),
                         MainElevatedButton(
                           isLoading: state is AuthLoading,

@@ -3,6 +3,12 @@ import 'package:google_fonts/google_fonts.dart';
 
 class ConfigurationTheme {
   const ConfigurationTheme();
+  static ColorScheme get colorScheme {
+    return ColorScheme.fromSeed(
+      seedColor: Colors.deepPurple,
+    );
+  }
+
   static InputDecorationTheme get inputDecorationTheme {
     return InputDecorationTheme(
         contentPadding: const EdgeInsets.all(16),
@@ -51,51 +57,57 @@ class ConfigurationTheme {
         fontSize: 22,
         fontWeight: FontWeight.w700,
       ),
-      headlineLarge: TextStyle(
+      headlineLarge: GoogleFonts.montserrat(
         fontSize: 24,
         fontWeight: FontWeight.w600,
       ),
-      headlineMedium: TextStyle(
+      headlineMedium: GoogleFonts.montserrat(
         fontSize: 20,
         fontWeight: FontWeight.w600,
       ),
-      headlineSmall: TextStyle(
+      headlineSmall: GoogleFonts.montserrat(
         fontSize: 18,
         fontWeight: FontWeight.w600,
       ),
-      titleLarge: GoogleFonts.montserrat(
+      titleLarge: TextStyle(
         fontSize: 22,
         fontWeight: FontWeight.w500,
       ),
-      titleMedium: GoogleFonts.montserrat(
+      titleMedium: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w500,
       ),
-      titleSmall: GoogleFonts.montserrat(
+      titleSmall: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w500,
       ),
       bodyLarge: TextStyle(
+        fontFamily: "Cera Pro",
         fontSize: 16,
         fontWeight: FontWeight.w400,
       ),
       bodyMedium: TextStyle(
+        fontFamily: "Cera Pro",
         fontSize: 14,
         fontWeight: FontWeight.w400,
       ),
       bodySmall: TextStyle(
+        fontFamily: "Cera Pro",
         fontSize: 12,
         fontWeight: FontWeight.w400,
       ),
       labelLarge: TextStyle(
+        fontFamily: "Cera Pro",
         fontSize: 14,
         fontWeight: FontWeight.w400,
       ),
       labelMedium: TextStyle(
+        fontFamily: "Cera Pro",
         fontSize: 12,
         fontWeight: FontWeight.w400,
       ),
       labelSmall: TextStyle(
+        fontFamily: "Cera Pro",
         fontSize: 10,
         fontWeight: FontWeight.w400,
       ),

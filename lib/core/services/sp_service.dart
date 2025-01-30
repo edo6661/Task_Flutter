@@ -1,4 +1,3 @@
-import 'package:frontend/core/utils/log_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SpService {
@@ -17,7 +16,5 @@ class SpService {
   Future<void> removeToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove(_keyToken);
-    String? token = await getToken();
-    LogService.d("TOKEN: $token");
   }
 }

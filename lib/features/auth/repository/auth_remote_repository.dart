@@ -4,11 +4,13 @@ import 'package:frontend/core/constants.dart';
 import 'package:frontend/core/api.dart';
 import 'package:frontend/core/services/sp_service.dart';
 import 'package:frontend/core/utils/log_service.dart';
+import 'package:frontend/features/auth/repository/auth_local_repository.dart';
 import 'package:frontend/models/user_model.dart';
 import 'package:http/http.dart' as http;
 
 class AuthRemoteRepository {
   final sp = SpService();
+  final _authLocalRepository = AuthLocalRepository();
   Future<ApiResponse<UserModel>> register({
     required String name,
     required String email,
@@ -23,7 +25,6 @@ class AuthRemoteRepository {
       // ! decode dari string ke json
       final Map<String, dynamic> responseData = jsonDecode(res.body);
       if (res.statusCode != 201) {
-        LogService.e(responseData.toString());
         return ApiError(
           message: responseData["message"] ?? "Registration failed",
           error: responseData["error"] ?? "",
@@ -56,25 +57,40 @@ class AuthRemoteRepository {
       // ! json decode tuh untuk mengubah string ke json
       final Map<String, dynamic> responseData = jsonDecode(res.body);
       if (res.statusCode != 200) {
+        final userLocal = await _authLocalRepository.getUser();
         LogService.e(responseData.toString());
-        return ApiError(
-          message: responseData["message"] ?? "Login failed",
-          error: responseData["error"] ?? "",
+        if (userLocal == null) {
+          return ApiError(
+            message: responseData["message"] ?? "Login failed",
+          );
+        }
+        return ApiSuccess(
+          message: "Failed to login from server, login from local",
+          data: userLocal,
         );
       }
       final user = UserModel.fromMap(responseData["data"]["user"]);
+
       final token = responseData["data"]["token"];
       final message = responseData["message"];
 
       await sp.setToken(token);
+      await _authLocalRepository.insertUser(user);
       return ApiSuccess(
         message: message,
         data: user,
       );
     } catch (e) {
       LogService.e(e.toString());
-      return ApiError(
-        message: e.toString(),
+      final userLocal = await _authLocalRepository.getUser();
+      if (userLocal == null) {
+        return ApiError(
+          message: e.toString(),
+        );
+      }
+      return ApiSuccess(
+        message: "Failed to login from server, login from local",
+        data: userLocal,
       );
     }
   }
@@ -94,21 +110,40 @@ class AuthRemoteRepository {
       );
       final Map<String, dynamic> responseData = jsonDecode(res.body);
       if (res.statusCode != 200) {
+        final userLocal = await _authLocalRepository.getUser();
         LogService.e(responseData.toString());
-        return null;
+        if (userLocal == null) {
+          return ApiError(
+            message: responseData["message"] ?? "Failed to get user",
+          );
+        }
+        return ApiSuccess(
+          message: "Failed to get user from server, getting from local",
+          data: userLocal,
+        );
       }
       final user = UserModel.fromMap(responseData["data"]);
+      await _authLocalRepository.insertUser(user);
       return ApiSuccess(
         message: responseData["message"],
         data: user,
       );
     } catch (e) {
-      LogService.e(e.toString());
-      return null;
+      final userLocal = await _authLocalRepository.getUser();
+      if (userLocal == null) {
+        return ApiError(
+          message: e.toString(),
+        );
+      }
+      return ApiSuccess(
+        message: "Failed to get user from server, getting from local",
+        data: userLocal,
+      );
     }
   }
 
   void logout() async {
     await sp.removeToken();
+    await _authLocalRepository.deleteUser();
   }
 }

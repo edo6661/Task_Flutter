@@ -6,14 +6,12 @@ class UserModel {
   final String email;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final String token;
   const UserModel({
     required this.id,
     required this.name,
     required this.email,
     required this.createdAt,
     required this.updatedAt,
-    required this.token,
   });
 
   static defaultUser() {
@@ -23,7 +21,6 @@ class UserModel {
       email: '',
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
-      token: '',
     );
   }
 
@@ -32,10 +29,25 @@ class UserModel {
       'id': id,
       'name': name,
       'email': email,
-      'createdAt': createdAt.millisecondsSinceEpoch,
-      'updatedAt': updatedAt.millisecondsSinceEpoch,
-      'token': token,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
     };
+  }
+
+  UserModel copyWith({
+    String? id,
+    String? name,
+    String? email,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
   }
 
   String toJson() => json.encode(toMap());
@@ -48,13 +60,12 @@ class UserModel {
       id: map['id'] ?? '',
       name: map['name'] ?? '',
       email: map['email'] ?? '',
-      token: map['token'] ?? '',
       createdAt: DateTime.parse(map['createdAt']),
       updatedAt: DateTime.parse(map['updatedAt']),
     );
   }
   @override
   String toString() {
-    return 'UserModel(id: $id, name: $name, email: $email, createdAt: $createdAt, updatedAt: $updatedAt, token: $token)';
+    return 'UserModel(id: $id, name: $name, email: $email, createdAt: $createdAt, updatedAt: $updatedAt';
   }
 }

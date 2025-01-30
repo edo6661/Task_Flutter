@@ -8,15 +8,18 @@ class MainTextField extends StatelessWidget {
   final Widget? leadingIcon;
   final bool? obscureText;
   final Validator? validator;
-  const MainTextField({
-    super.key,
-    required this.controller,
-    required this.hintText,
-    this.trailingIcon,
-    this.leadingIcon,
-    this.obscureText,
-    this.validator,
-  });
+  final int maxLines;
+  final bool isEnabled;
+  const MainTextField(
+      {super.key,
+      required this.controller,
+      required this.hintText,
+      this.trailingIcon,
+      this.leadingIcon,
+      this.obscureText,
+      this.validator,
+      this.maxLines = 1,
+      this.isEnabled = true});
 
   @override
   Widget build(BuildContext context) {
@@ -24,10 +27,12 @@ class MainTextField extends StatelessWidget {
       controller: controller,
       validator: validator,
       obscureText: obscureText ?? false,
+      maxLines: maxLines,
       decoration: InputDecoration(
         hintText: hintText,
         suffixIcon: trailingIcon,
         prefixIcon: leadingIcon,
+        enabled: isEnabled,
       ),
     );
   }

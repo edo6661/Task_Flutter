@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/common/extent.dart';
-import 'package:frontend/core/utils/log_service.dart';
 import 'package:frontend/features/auth/cubit/auth_cubit.dart';
 import 'package:frontend/features/auth/pages/sign_up_page.dart';
 import 'package:frontend/features/home/pages/home_page.dart';
 import 'package:frontend/ui/components/center_circular_loading.dart';
 import 'package:frontend/ui/components/center_column_container.dart';
+import 'package:frontend/ui/components/main_elevated_button.dart';
 import 'package:frontend/ui/components/main_text.dart';
 import 'package:frontend/ui/components/main_text_field.dart';
 import "package:flutter_bloc/flutter_bloc.dart";
@@ -20,17 +20,17 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
-  final nameController = TextEditingController();
+  final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
   bool obscurePassword = false;
   String? passwordError;
 
-  void signIn() {
+  void signIn() async {
     if (formKey.currentState!.validate()) {
-      context.read<AuthCubit>().login(
-          email: nameController.text.trim(),
+      await context.read<AuthCubit>().login(
+          email: emailController.text.trim(),
           password: passwordController.text.trim());
     }
   }
@@ -45,7 +45,8 @@ class _SignInPageState extends State<SignInPage> {
               .showSnackBar(SnackBar(content: Text(state.message)));
         }
         if (state is AuthLogin) {
-          Navigator.pushAndRemoveUntil(context, HomePage.route(), (_) => false);
+          Navigator.of(context)
+              .pushAndRemoveUntil(HomePage.route(), (_) => false);
         }
       },
       builder: (context, state) {
@@ -64,15 +65,16 @@ class _SignInPageState extends State<SignInPage> {
                       spacing: 16,
                       children: [
                         MainTextField(
-                          controller: nameController,
-                          hintText: "Name",
+                          controller: emailController,
+                          hintText: "Email",
                           leadingIcon: Icon(Icons.person),
                           validator: (val) {
                             if (val!.isEmpty) {
-                              return "Name cannot be empty";
+                              return "Email cannot be empty";
                             }
                             return null;
                           },
+                          isEnabled: (state is! AuthLoading),
                         ),
                         MainTextField(
                           controller: passwordController,
@@ -90,10 +92,13 @@ class _SignInPageState extends State<SignInPage> {
                                     : Icons.visibility,
                               )),
                           obscureText: !obscurePassword,
+                          isEnabled: (state is! AuthLoading),
                         ),
-                        ElevatedButton(
-                            onPressed: signIn,
-                            child: MainText(text: "Sign In", extent: Large())),
+                        MainElevatedButton(
+                          onPressed: signIn,
+                          text: "Sign In",
+                          isLoading: state is AuthLoading,
+                        ),
                       ],
                     ),
                   ),
@@ -124,7 +129,7 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   void dispose() {
-    nameController.dispose();
+    emailController.dispose();
     passwordController.dispose();
     super.dispose();
   }

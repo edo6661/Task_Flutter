@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/features/auth/cubit/auth_cubit.dart';
 import 'package:frontend/features/auth/pages/sign_in_page.dart';
 import 'package:frontend/features/home/pages/home_page.dart';
+import 'package:frontend/features/task/cubit/tasks_cubit.dart';
 import 'package:frontend/ui/components/configuration_theme.dart';
 
 void main() {
@@ -10,6 +11,7 @@ void main() {
     MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => AuthCubit()),
+        BlocProvider(create: (context) => TasksCubit())
       ],
       child: const MyApp(),
     ),
@@ -38,9 +40,9 @@ class _MyAppState extends State<MyApp> {
         fontFamily: 'Poppins',
         // ! inputDecorationTheme: InputDecorationTheme, membuat agar semua input field memiliki textdecoration yang sama
         inputDecorationTheme: ConfigurationTheme.inputDecorationTheme,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        textTheme: ConfigurationTheme.textTheme,
+        colorScheme: ConfigurationTheme.colorScheme,
 
+        textTheme: ConfigurationTheme.textTheme,
         elevatedButtonTheme: ConfigurationTheme.elevatedButtonTheme,
         useMaterial3: true,
         fontFamilyFallback: ['Poppins'],
@@ -48,7 +50,7 @@ class _MyAppState extends State<MyApp> {
       // ! kalo ga butuh listener / ga butuh untuk kasih snackbar, bisa pake BlocBuilder
       home: BlocBuilder<AuthCubit, AuthState>(
         builder: (context, state) {
-          if (state is AuthLoggedIn) {
+          if (state is AuthLogin) {
             return const HomePage();
           }
           return const SignInPage();
