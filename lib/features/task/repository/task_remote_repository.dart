@@ -128,6 +128,7 @@ class TaskRemoteRepository {
         );
       }
       final unsyncedTasks = await taskLocalRepository.getUnsyncedTasks();
+      // ! kalo unsyncedTasks nya kosong, berarti semua task udah synced artinya user saat offline belum pernah create task
       if (unsyncedTasks.isEmpty) {
         return ApiSuccess(
           message: "No unsynced tasks because all tasks are synced",
@@ -137,6 +138,7 @@ class TaskRemoteRepository {
       final res = await http.post(
           Uri.parse("${Constants.apiUrl}${Constants.pathSyncTask}"),
           headers: {"Content-Type": "application/json", "x-token": token},
+          // ! ngirim task yang masih unsynced ke server, biar server dapet data yang udah di create saat user offline
           body: jsonEncode(
             unsyncedTasks.map((task) => task.toMap()).toList(),
           ));
@@ -149,6 +151,7 @@ class TaskRemoteRepository {
       }
 
       for (final task in unsyncedTasks) {
+        // ! setelah berhasil di insert ke server, isSynced nya di set jadi synced, karena udah berhasil di insert ke server
         await taskLocalRepository.updateSync(
           id: task.id,
           isSynced: SyncStatus.synced.index,

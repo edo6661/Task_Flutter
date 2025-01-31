@@ -87,9 +87,13 @@ class TaskLocalRepository {
     return result.map((task) => TaskModel.fromMap(task)).toList();
   }
 
+  // ! nyari unsynced task kenapa?
+  // * kalo user nge create task offline, tasknya bakal disimpan di local dulu dan isSynced nya di set jadi unsynced
+  // * setelah user online, task yang masih unsynced bakal di insert ke server
+  // * jadi server dapet data yang udah di create saat user offline
+  // * setelah berhasil di insert ke server, isSynced nya di set jadi synced
   Future<List<TaskModel>> getUnsyncedTasks() async {
     final db = await database;
-    // ! nyari task yang isSynced nya 0
     final result = await db.query(tableName, where: 'isSynced = ?', whereArgs: [
       SyncStatus.unsynced.index,
     ]);
@@ -116,6 +120,8 @@ class TaskLocalRepository {
     await db.update(
       tableName,
       {
+        // ! kenapa ini ga benar benar di delete tapi cuman di update isDeleted nya jadi deleted?
+        // * karena kita butuh data task yang udah di delete (saat user offline), biar bisa di delete di server
         'isDeleted': DeleteStatus.deleted.index,
       },
       where: 'id = ?',
@@ -123,11 +129,13 @@ class TaskLocalRepository {
     );
   }
 
+  // ! kalo user nge delete task offline, dan user online, task yang udah di delete bakal di delete di server dan di local
   Future<void> deleteTasks() async {
     final db = await database;
     await db.delete(tableName);
   }
 
+  // ! buat nge delete di remote semua task yang isDeleted nya udah di set jadi deleted
   Future<List<TaskModel>> getDeletedTasks() async {
     final db = await database;
     final result =
@@ -140,6 +148,7 @@ class TaskLocalRepository {
     return result.map((task) => TaskModel.fromMap(task)).toList();
   }
 
+  // ! setelah berhasil di delete di server, task yang isDeleted nya udah di set jadi deleted di local bakal di delete
   Future<void> removeAllDeletedTask() async {
     final db = await database;
     await db.delete(tableName,
