@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/common/extent.dart';
-import 'package:frontend/core/utils/log_service.dart';
 import 'package:frontend/features/auth/cubit/auth_cubit.dart';
 import 'package:frontend/features/auth/pages/sign_up_page.dart';
 import 'package:frontend/features/home/pages/home_page.dart';
@@ -10,7 +9,6 @@ import 'package:frontend/ui/components/main_elevated_button.dart';
 import 'package:frontend/ui/components/main_text.dart';
 import 'package:frontend/ui/components/main_text_field.dart';
 import "package:flutter_bloc/flutter_bloc.dart";
-import 'package:frontend/ui/components/no_internet_page.dart';
 import 'package:frontend/ui/utils/navigate_to_no_internet_connection.dart';
 import 'package:frontend/ui/utils/validator.dart';
 

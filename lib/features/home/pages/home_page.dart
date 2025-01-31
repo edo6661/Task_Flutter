@@ -170,6 +170,7 @@ class _HomePageState extends State<HomePage> {
             final task = tasks[index];
             return Dismissible(
               key: Key(task.id),
+              // ! startToEnd
               secondaryBackground: Container(
                 decoration: BoxDecoration(
                   color: Colors.red,
@@ -177,11 +178,12 @@ class _HomePageState extends State<HomePage> {
                 ),
                 padding: EdgeInsets.only(right: 16),
                 alignment: Alignment.centerRight,
-                child: const Icon(
+                child: Icon(
                   CupertinoIcons.trash,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
+              // ! endToStart
               background: Container(
                 decoration: BoxDecoration(
                   color: Colors.green,
@@ -189,9 +191,9 @@ class _HomePageState extends State<HomePage> {
                 ),
                 padding: EdgeInsets.only(left: 16),
                 alignment: Alignment.centerLeft,
-                child: const Icon(
+                child: Icon(
                   CupertinoIcons.pencil,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
               direction: DismissDirection.horizontal,
@@ -238,9 +240,6 @@ class _HomePageState extends State<HomePage> {
                       );
                     },
                   );
-                  // TODO: delete soon
-                  LogService.i("confirmDelete: $confirmDelete");
-                  // kalo confirmDelete null, maka return false
                   return confirmDelete ?? false;
                 }
                 return false;

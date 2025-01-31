@@ -14,6 +14,7 @@ class TaskModel {
   final DateTime createdAt;
   final DateTime updatedAt;
   final int isSynced;
+  final int isDeleted;
   final String userId;
   TaskModel({
     required this.id,
@@ -25,6 +26,7 @@ class TaskModel {
     required this.updatedAt,
     required this.color,
     required this.isSynced,
+    this.isDeleted = 0,
   });
 
   TaskModel copyWith({
@@ -38,6 +40,7 @@ class TaskModel {
     DateTime? updatedAt,
     int? isSynced,
     String? userId,
+    int? isDeleted,
   }) {
     return TaskModel(
       id: id ?? this.id,
@@ -49,6 +52,7 @@ class TaskModel {
       color: color ?? this.color,
       isSynced: isSynced ?? this.isSynced,
       userId: userId ?? this.userId,
+      isDeleted: isDeleted ?? this.isDeleted,
     );
   }
 
@@ -63,6 +67,7 @@ class TaskModel {
       'hexColor': rgbToHex(color),
       'isSynced': isSynced,
       'userId': userId,
+      'isDeleted': isDeleted,
     };
   }
 
@@ -79,6 +84,7 @@ class TaskModel {
       // ! kalo dapet data dari server, isSynced nya true, karena data yang di server itu synced
       isSynced: map['isSynced'] ?? 1,
       userId: map['userId'] ?? '',
+      isDeleted: map['isDeleted'] ?? 0,
     );
   }
 
@@ -89,7 +95,7 @@ class TaskModel {
 
   @override
   String toString() {
-    return 'TaskModel(id: $id, title: $title, description: $description, dueAt: $dueAt, createdAt: $createdAt, updatedAt: $updatedAt), color: $color, isSynced: $isSynced, userId: $userId';
+    return 'TaskModel(id: $id, title: $title, description: $description, dueAt: $dueAt, createdAt: $createdAt, updatedAt: $updatedAt), color: $color, isSynced: $isSynced, userId: $userId, isDeleted: $isDeleted';
   }
 
   @override
@@ -104,7 +110,8 @@ class TaskModel {
         other.updatedAt == updatedAt &&
         other.color == color &&
         other.isSynced == isSynced &&
-        other.userId == userId;
+        other.userId == userId &&
+        other.isDeleted == isDeleted;
   }
 
   @override
@@ -117,6 +124,7 @@ class TaskModel {
         updatedAt.hashCode ^
         color.hashCode ^
         isSynced.hashCode ^
-        userId.hashCode;
+        userId.hashCode ^
+        isDeleted.hashCode;
   }
 }

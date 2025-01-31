@@ -42,7 +42,6 @@ class AuthRemoteRepository {
     } on SocketException {
       return ApiError(message: Constants.noInternetConnection);
     } catch (e) {
-      LogService.e(e.toString());
       return ApiError(
         message: e.toString(),
       );
@@ -64,7 +63,6 @@ class AuthRemoteRepository {
 
       if (res.statusCode != 200) {
         final userLocal = await _authLocalRepository.getUser();
-        LogService.e(responseData.toString());
         if (userLocal == null) {
           return ApiError(
             message: responseData["message"] ?? "Login failed",
@@ -90,7 +88,6 @@ class AuthRemoteRepository {
     } on SocketException {
       return ApiError(message: Constants.noInternetConnection);
     } catch (e) {
-      LogService.e(e.toString());
       final userLocal = await _authLocalRepository.getUser();
       if (userLocal == null) {
         return ApiError(
@@ -120,7 +117,6 @@ class AuthRemoteRepository {
       final Map<String, dynamic> responseData = jsonDecode(res.body);
       if (res.statusCode != 200) {
         final userLocal = await _authLocalRepository.getUser();
-        LogService.e(responseData.toString());
         if (userLocal == null) {
           return ApiError(
             message: responseData["message"] ?? "Failed to get user",

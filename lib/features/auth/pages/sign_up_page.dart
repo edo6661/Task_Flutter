@@ -8,7 +8,6 @@ import 'package:frontend/ui/components/center_column_container.dart';
 import 'package:frontend/ui/components/main_elevated_button.dart';
 import 'package:frontend/ui/components/main_text.dart';
 import 'package:frontend/ui/components/main_text_field.dart';
-import 'package:frontend/ui/components/no_internet_page.dart';
 import 'package:frontend/ui/utils/navigate_to_no_internet_connection.dart';
 import 'package:frontend/ui/utils/validator.dart';
 

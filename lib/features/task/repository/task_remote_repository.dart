@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:frontend/core/api.dart';
 import 'package:frontend/core/constants.dart';
+import 'package:frontend/core/enums.dart';
 import 'package:frontend/core/services/sp_service.dart';
 import 'package:frontend/core/utils/hex_to_rgb.dart';
 import 'package:frontend/features/task/repository/task_local_repository.dart';
@@ -62,7 +63,7 @@ class TaskRemoteRepository {
           dueAt: dueAt,
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
-          isSynced: 0,
+          isSynced: SyncStatus.unsynced.index,
         );
         await taskLocalRepository.insertTask(task);
         return ApiSuccess(
@@ -118,9 +119,7 @@ class TaskRemoteRepository {
     }
   }
 
-  Future<ApiResponse<bool>> syncTask({
-    required List<TaskModel> tasks,
-  }) async {
+  Future<ApiResponse<bool>> syncTask() async {
     try {
       final String? token = await sp.getToken();
       if (token == null) {
@@ -128,11 +127,18 @@ class TaskRemoteRepository {
           message: "Token not found",
         );
       }
+      final unsyncedTasks = await taskLocalRepository.getUnsyncedTasks();
+      if (unsyncedTasks.isEmpty) {
+        return ApiSuccess(
+          message: "No unsynced tasks because all tasks are synced",
+          data: true,
+        );
+      }
       final res = await http.post(
           Uri.parse("${Constants.apiUrl}${Constants.pathSyncTask}"),
           headers: {"Content-Type": "application/json", "x-token": token},
           body: jsonEncode(
-            tasks.map((task) => task.toMap()).toList(),
+            unsyncedTasks.map((task) => task.toMap()).toList(),
           ));
       final responseData = jsonDecode(res.body);
       if (res.statusCode != 201) {
@@ -142,8 +148,40 @@ class TaskRemoteRepository {
         );
       }
 
+      for (final task in unsyncedTasks) {
+        await taskLocalRepository.updateSync(
+          id: task.id,
+          isSynced: SyncStatus.synced.index,
+        );
+      }
+
       return ApiSuccess(
         message: responseData["message"],
+        data: true,
+      );
+    } catch (e) {
+      return ApiError(
+        message: e.toString(),
+      );
+    }
+  }
+
+  Future<ApiResponse<bool>> syncDeletedTask() async {
+    try {
+      final deletedLocalTasks = await taskLocalRepository.getDeletedTasks();
+      if (deletedLocalTasks.isEmpty) {
+        return ApiSuccess(
+          message: "No deleted tasks because all deleted tasks are empty",
+          data: true,
+        );
+      }
+
+      for (final task in deletedLocalTasks) {
+        await deleteTask(id: task.id);
+      }
+      await taskLocalRepository.removeAllDeletedTask();
+      return ApiSuccess(
+        message: "Remove all local deleted tasks",
         data: true,
       );
     } catch (e) {

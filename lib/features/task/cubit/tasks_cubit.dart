@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/core/api.dart';
-import 'package:frontend/core/utils/log_service.dart';
 import 'package:frontend/core/utils/rgb_to_hex.dart';
 import 'package:frontend/features/task/repository/task_local_repository.dart';
 import 'package:frontend/features/task/repository/task_remote_repository.dart';
@@ -58,21 +57,8 @@ class TasksCubit extends Cubit<TasksState> {
 
   Future<void> syncTasks() async {
     try {
-      final unsyncedTasks = await taskLocalRepository.getUnsyncedTasks();
-      if (unsyncedTasks.isEmpty) {
-        return;
-      }
-      final res = await taskRemoteRepository.syncTask(
-        tasks: unsyncedTasks,
-      );
-      if (res is ApiSuccess) {
-        for (final task in unsyncedTasks) {
-          await taskLocalRepository.updateSync(
-            id: task.id,
-            isSynced: 1,
-          );
-        }
-      }
+      await taskRemoteRepository.syncDeletedTask();
+      await taskRemoteRepository.syncTask();
     } catch (e) {
       emit(TasksFailed(e.toString()));
     }

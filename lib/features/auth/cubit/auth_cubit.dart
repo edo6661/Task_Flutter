@@ -70,7 +70,6 @@ class AuthCubit extends Cubit<AuthState> {
         emit(AuthInitial());
       }
     } catch (e) {
-      LogService.e(e.toString());
       emit(AuthInitial());
     }
   }
@@ -81,7 +80,6 @@ class AuthCubit extends Cubit<AuthState> {
       _authRemoteRepository.logout();
       emit(AuthInitial());
     } catch (e) {
-      LogService.e(e.toString());
       emit(AuthError(e.toString()));
     }
   }
