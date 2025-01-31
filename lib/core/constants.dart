@@ -7,10 +7,14 @@ class Constants {
   static String get pathRegister => "/auth/register";
   static String get pathLogin => "/auth/login";
   static String get pathUser => "/auth";
+  static String get pathTask => "/tasks";
   static String get pathCreateTask => "/tasks";
   static String get pathSyncTask => "/tasks/sync";
   static String get pathGetTasks => "/tasks";
   static String get userUsername => "test";
   static String get userEmail => "test@gmail.com";
   static String get userPassword => "test";
+
+  // ! error
+  static String get noInternetConnection => "No Internet Connection";
 }

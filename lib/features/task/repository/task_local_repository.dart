@@ -62,11 +62,6 @@ class TaskLocalRepository {
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future<void> deleteTask() async {
-    final db = await database;
-    await db.delete(tableName);
-  }
-
   Future<List<TaskModel>> getTasks() async {
     final db = await database;
     final result = await db.query(tableName);
@@ -99,5 +94,19 @@ class TaskLocalRepository {
       where: 'id = ?',
       whereArgs: [id],
     );
+  }
+
+  Future<void> deleteTask(String id) async {
+    final db = await database;
+    await db.delete(
+      tableName,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> deleteTasks() async {
+    final db = await database;
+    await db.delete(tableName);
   }
 }

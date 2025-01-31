@@ -3,6 +3,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 class ConfigurationTheme {
   const ConfigurationTheme();
+  static AppBarTheme appBarTheme(BuildContext context) {
+    return AppBarTheme(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      scrolledUnderElevation: 0,
+    );
+  }
+
   static ColorScheme get colorScheme {
     return ColorScheme.fromSeed(
       seedColor: Colors.deepPurple,

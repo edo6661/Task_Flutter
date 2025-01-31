@@ -4,7 +4,6 @@ import 'package:frontend/core/api.dart';
 import 'package:frontend/core/constants.dart';
 import 'package:frontend/core/services/sp_service.dart';
 import 'package:frontend/core/utils/hex_to_rgb.dart';
-import 'package:frontend/core/utils/log_service.dart';
 import 'package:frontend/features/task/repository/task_local_repository.dart';
 import 'package:frontend/models/task_model.dart';
 import 'package:http/http.dart' as http;
@@ -39,18 +38,6 @@ class TaskRemoteRepository {
           }));
       final responseData = jsonDecode(res.body);
       if (res.statusCode != 201) {
-        final task = TaskModel(
-          id: const Uuid().v4(),
-          title: title,
-          description: description,
-          color: hexToRgb(hexColor),
-          userId: userId,
-          dueAt: dueAt,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-          isSynced: 0,
-        );
-        await taskLocalRepository.insertTask(task);
         return ApiError(
           message: responseData["message"] ?? "Failed to create task",
           error: responseData["error"] ?? "",
@@ -103,16 +90,9 @@ class TaskRemoteRepository {
           headers: {"Content-Type": "application/json", "x-token": token});
       final responseData = jsonDecode(res.body);
       if (res.statusCode != 200) {
-        final tasks = await taskLocalRepository.getTasks();
-        if (tasks.isEmpty) {
-          return ApiError(
-            message: responseData["message"] ?? "Failed to get tasks",
-            error: responseData["error"] ?? "",
-          );
-        }
-        return ApiSuccess(
-          message: "Failed to get tasks from server, getting from local",
-          data: tasks,
+        return ApiError(
+          message: responseData["message"] ?? "Failed to get tasks",
+          error: responseData["error"] ?? "",
         );
       }
       final tasks = responseData["data"]
@@ -170,6 +150,88 @@ class TaskRemoteRepository {
       return ApiError(
         message: e.toString(),
       );
+    }
+  }
+
+  Future<ApiResponse<bool>> deleteTask({
+    required String id,
+  }) async {
+    try {
+      final String? token = await sp.getToken();
+      if (token == null) {
+        return ApiError(
+          message: "Token not found",
+        );
+      }
+      final res = await http.delete(
+        Uri.parse("${Constants.apiUrl}${Constants.pathTask}/$id"),
+        headers: {"Content-Type": "application/json", "x-token": token},
+      );
+      final responseData = jsonDecode(res.body);
+      if (res.statusCode != 200) {
+        return ApiError(
+          message: responseData["message"] ?? "Failed to delete task",
+          error: responseData["error"] ?? "",
+        );
+      }
+      await taskLocalRepository.deleteTask(id);
+      return ApiSuccess(
+        message: responseData["message"],
+        data: true,
+      );
+    } catch (e) {
+      try {
+        await taskLocalRepository.deleteTask(id);
+        return ApiSuccess(
+          message: "Deleted task locally, will sync later",
+          data: true,
+        );
+      } catch (e) {
+        return ApiError(
+          message: e.toString(),
+        );
+      }
+    }
+  }
+
+  Future<ApiResponse<TaskModel>> updateTask({required TaskModel task}) async {
+    try {
+      final String? token = await sp.getToken();
+      if (token == null) {
+        return ApiError(
+          message: "Token not found",
+        );
+      }
+      final res = await http.patch(
+        Uri.parse("${Constants.apiUrl}${Constants.pathTask}/${task.id}"),
+        headers: {"Content-Type": "application/json", "x-token": token},
+        body: jsonEncode(task.toMap()),
+      );
+      final responseData = jsonDecode(res.body);
+      if (res.statusCode != 200) {
+        return ApiError(
+          message: responseData["message"] ?? "Failed to update task",
+          error: responseData["error"] ?? "",
+        );
+      }
+      final updatedTask = TaskModel.fromMap(responseData["data"]);
+      await taskLocalRepository.insertTask(updatedTask);
+      return ApiSuccess(
+        message: responseData["message"],
+        data: updatedTask,
+      );
+    } catch (e) {
+      try {
+        await taskLocalRepository.insertTask(task);
+        return ApiSuccess(
+          message: "Updated task locally, will sync later",
+          data: task,
+        );
+      } catch (e) {
+        return ApiError(
+          message: e.toString(),
+        );
+      }
     }
   }
 }

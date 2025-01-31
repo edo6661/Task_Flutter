@@ -28,6 +28,20 @@ final class TasksGetSuccess extends TasksState {
   final List<TaskModel> tasks;
 }
 
+final class TasksUpdateSuccess extends TasksState {
+  const TasksUpdateSuccess(
+    this.message,
+  );
+  final String message;
+}
+
+final class TasksDeleteSuccess extends TasksState {
+  const TasksDeleteSuccess(
+    this.message,
+  );
+  final String message;
+}
+
 final class TasksFailed extends TasksState {
   const TasksFailed(
     this.message,

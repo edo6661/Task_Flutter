@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/core/api.dart';
+import 'package:frontend/core/constants.dart';
 import 'package:frontend/core/utils/log_service.dart';
 import 'package:frontend/features/auth/repository/auth_remote_repository.dart';
 import 'package:frontend/models/user_model.dart';
@@ -18,12 +19,18 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthLoading());
       final res = await _authRemoteRepository.register(
           name: name, email: email, password: password);
-      emit(
-        AuthSignUp(
-          user: res.data ?? UserModel.defaultUser(),
+      if (res is ApiSuccess && res.data != null) {
+        emit(AuthSignUp(
+          user: res.data!,
           message: res.message,
-        ),
-      );
+        ));
+        return;
+      }
+      if (res.message == Constants.noInternetConnection) {
+        emit(AuthNoInternet());
+      } else {
+        emit(AuthError(res.message));
+      }
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -39,6 +46,10 @@ class AuthCubit extends Cubit<AuthState> {
           // ! gapapa pakai null safety karena sudah di cek di atas
           res.data!,
         ));
+        return;
+      }
+      if (res.message == Constants.noInternetConnection) {
+        emit(AuthNoInternet());
       } else {
         emit(AuthError(res.message));
       }
@@ -64,7 +75,7 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  void logout() async {
+  Future<void> logout() async {
     try {
       emit(AuthLoading());
       _authRemoteRepository.logout();

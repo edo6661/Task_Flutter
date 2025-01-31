@@ -41,6 +41,7 @@ class _MyAppState extends State<MyApp> {
         // ! inputDecorationTheme: InputDecorationTheme, membuat agar semua input field memiliki textdecoration yang sama
         inputDecorationTheme: ConfigurationTheme.inputDecorationTheme,
         colorScheme: ConfigurationTheme.colorScheme,
+        appBarTheme: ConfigurationTheme.appBarTheme(context),
 
         textTheme: ConfigurationTheme.textTheme,
         elevatedButtonTheme: ConfigurationTheme.elevatedButtonTheme,

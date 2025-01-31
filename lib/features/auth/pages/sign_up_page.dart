@@ -8,6 +8,9 @@ import 'package:frontend/ui/components/center_column_container.dart';
 import 'package:frontend/ui/components/main_elevated_button.dart';
 import 'package:frontend/ui/components/main_text.dart';
 import 'package:frontend/ui/components/main_text_field.dart';
+import 'package:frontend/ui/components/no_internet_page.dart';
+import 'package:frontend/ui/utils/navigate_to_no_internet_connection.dart';
+import 'package:frontend/ui/utils/validator.dart';
 
 class SignUpPage extends StatefulWidget {
   static route() => MaterialPageRoute(builder: (context) => const SignUpPage());
@@ -53,6 +56,9 @@ class _SignUpPageState extends State<SignUpPage> {
       if (state is AuthSignUp) {
         Navigator.of(context).push(SignInPage.route());
       }
+      if (state is AuthNoInternet) {
+        navigateToNoInternetConnection(context);
+      }
     },
             // ! Tujuan: Builder digunakan untuk membangun ulang UI ketika ada perubahan pada data atau state.
 
@@ -88,12 +94,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             controller: emailController,
                             hintText: "Email",
                             leadingIcon: Icon(Icons.email),
-                            validator: (val) {
-                              if (val!.isEmpty) {
-                                return "Email cannot be empty";
-                              }
-                              return null;
-                            },
+                            validator: EmailValidator.validate,
                             isEnabled: (state is! AuthLoading)),
                         MainTextField(
                           controller: passwordController,
