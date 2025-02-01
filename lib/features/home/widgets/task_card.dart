@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/common/extent.dart';
 import 'package:frontend/ui/components/main_text.dart';
+import 'package:intl/intl.dart';
 
 class TaskCard extends StatelessWidget {
   final Color color;
   final String headerText;
   final String descritionText;
+  final DateTime dueAt;
   const TaskCard({
     super.key,
     required this.color,
     required this.headerText,
     required this.descritionText,
+    required this.dueAt,
   });
 
   @override
@@ -29,21 +32,34 @@ class TaskCard extends StatelessWidget {
         color: color,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Column(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          MainText(
-            text: headerText,
-            extent: Small(),
-            color: textColor,
-            maxLines: 2,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                MainText(
+                  text: headerText,
+                  extent: Small(),
+                  color: textColor,
+                  maxLines: 2,
+                ),
+                MainText(
+                  text: descritionText,
+                  maxLines: 4,
+                  overflow: TextOverflow.ellipsis,
+                  extent: ExtraSmall(),
+                  color: textColor,
+                ),
+              ],
+            ),
           ),
           MainText(
-            text: descritionText,
-            maxLines: 4,
-            overflow: TextOverflow.ellipsis,
+            text: DateFormat('hh:mm a').format(dueAt),
             extent: ExtraSmall(),
-            color: textColor,
+            color: textColor.withValues(alpha: 0.9),
           ),
         ],
       ),
