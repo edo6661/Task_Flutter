@@ -38,8 +38,6 @@ class _UpdateTaskPageState extends State<UpdateTaskPage> {
       body: BlocConsumer<TasksCubit, TasksState>(
         listener: (context, state) {
           if (state is TasksUpdateSuccess) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(state.message)));
             Navigator.pushAndRemoveUntil(
               context,
               HomePage.route(),

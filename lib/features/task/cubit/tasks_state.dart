@@ -15,10 +15,8 @@ final class TasksLoading extends TasksState {
 final class TasksCreateSuccess extends TasksState {
   const TasksCreateSuccess(
     this.task,
-    this.message,
   );
   final TaskModel task;
-  final String message;
 }
 
 final class TasksGetSuccess extends TasksState {
@@ -29,17 +27,11 @@ final class TasksGetSuccess extends TasksState {
 }
 
 final class TasksUpdateSuccess extends TasksState {
-  const TasksUpdateSuccess(
-    this.message,
-  );
-  final String message;
+  const TasksUpdateSuccess();
 }
 
 final class TasksDeleteSuccess extends TasksState {
-  const TasksDeleteSuccess(
-    this.message,
-  );
-  final String message;
+  const TasksDeleteSuccess();
 }
 
 final class TasksFailed extends TasksState {

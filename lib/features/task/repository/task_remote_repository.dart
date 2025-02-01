@@ -5,6 +5,7 @@ import 'package:frontend/core/constants.dart';
 import 'package:frontend/core/enums.dart';
 import 'package:frontend/core/services/sp_service.dart';
 import 'package:frontend/core/utils/hex_to_rgb.dart';
+import 'package:frontend/core/utils/log_service.dart';
 import 'package:frontend/features/task/repository/task_local_repository.dart';
 import 'package:frontend/models/task_model.dart';
 import 'package:http/http.dart' as http;
@@ -14,6 +15,16 @@ class TaskRemoteRepository {
   final sp = SpService();
   final taskLocalRepository = TaskLocalRepository();
 
+  getToken() async {
+    final String? token = await sp.getToken();
+    if (token == null) {
+      return ApiError(
+        message: "Token not found",
+      );
+    }
+    return token;
+  }
+
   Future<ApiResponse<TaskModel>> createTask({
     required String title,
     required String description,
@@ -22,12 +33,7 @@ class TaskRemoteRepository {
     required String userId,
   }) async {
     try {
-      final String? token = await sp.getToken();
-      if (token == null) {
-        return ApiError(
-          message: "Token not found",
-        );
-      }
+      final String token = await getToken();
       final res = await http.post(
           Uri.parse("${Constants.apiUrl}${Constants.pathCreateTask}"),
           headers: {"Content-Type": "application/json", "x-token": token},
@@ -80,12 +86,8 @@ class TaskRemoteRepository {
 
   Future<ApiResponse<List<TaskModel>>> getTasks() async {
     try {
-      final String? token = await sp.getToken();
-      if (token == null) {
-        return ApiError(
-          message: "Token not found",
-        );
-      }
+      final String token = await getToken();
+
       final res = await http.get(
           Uri.parse("${Constants.apiUrl}${Constants.pathGetTasks}"),
           headers: {"Content-Type": "application/json", "x-token": token});
@@ -121,12 +123,8 @@ class TaskRemoteRepository {
 
   Future<ApiResponse<bool>> syncTask() async {
     try {
-      final String? token = await sp.getToken();
-      if (token == null) {
-        return ApiError(
-          message: "Token not found",
-        );
-      }
+      final String token = await getToken();
+
       final unsyncedTasks = await taskLocalRepository.getUnsyncedTasks();
       // ! kalo unsyncedTasks nya kosong, berarti semua task udah synced artinya user saat offline belum pernah create task
       if (unsyncedTasks.isEmpty) {
@@ -198,12 +196,8 @@ class TaskRemoteRepository {
     required String id,
   }) async {
     try {
-      final String? token = await sp.getToken();
-      if (token == null) {
-        return ApiError(
-          message: "Token not found",
-        );
-      }
+      final String token = await getToken();
+
       final res = await http.delete(
         Uri.parse("${Constants.apiUrl}${Constants.pathTask}/$id"),
         headers: {"Content-Type": "application/json", "x-token": token},
@@ -237,12 +231,8 @@ class TaskRemoteRepository {
 
   Future<ApiResponse<TaskModel>> updateTask({required TaskModel task}) async {
     try {
-      final String? token = await sp.getToken();
-      if (token == null) {
-        return ApiError(
-          message: "Token not found",
-        );
-      }
+      final String token = await getToken();
+
       final res = await http.patch(
         Uri.parse("${Constants.apiUrl}${Constants.pathTask}/${task.id}"),
         headers: {"Content-Type": "application/json", "x-token": token},

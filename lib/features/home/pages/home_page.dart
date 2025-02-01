@@ -17,6 +17,7 @@ import 'package:frontend/features/task/pages/update_task_page.dart';
 import 'package:frontend/models/task_model.dart';
 import 'package:frontend/ui/components/center_circular_loading.dart';
 import 'package:frontend/ui/components/center_column_container.dart';
+import 'package:frontend/ui/components/empty_data.dart';
 import 'package:frontend/ui/components/main_text.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -98,14 +99,6 @@ class _HomePageState extends State<HomePage> {
               ScaffoldMessenger.of(context)
                   .showSnackBar(SnackBar(content: Text(state.message)));
             }
-            if (state is TasksUpdateSuccess) {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(state.message)));
-            }
-            if (state is TasksDeleteSuccess) {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(state.message)));
-            }
           },
           builder: (context, state) {
             if (state is TasksLoading) {
@@ -155,7 +148,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildEmptyTask() {
-    return Center(child: MainText(text: "Task is empty"));
+    return EmptyData(title: "No Task Available");
   }
 
   Widget _buildTaskList(List<TaskModel> tasks) {
@@ -218,8 +211,9 @@ class _HomePageState extends State<HomePage> {
                           extent: Large(),
                         ),
                         content: MainText(
-                          text: "Apakah anda yakin ingin menghapus task ini?",
-                          extent: Medium(),
+                          text: "Are you sure want to delete this task?",
+                          extent: Small(),
+                          maxLines: 2,
                         ),
                         actions: [
                           TextButton(
