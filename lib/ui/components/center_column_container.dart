@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
 class CenterColumnContainer extends StatelessWidget {
-  const CenterColumnContainer(
-      {super.key,
-      required this.child,
-      this.withPaddingHor = true,
-      this.isVerticallyCentered = false});
+  const CenterColumnContainer({
+    super.key,
+    required this.child,
+    this.withPaddingHor = true,
+    this.isVerticallyCentered = false,
+  });
 
   final Widget child;
   final bool withPaddingHor;
   final bool isVerticallyCentered;
+
   Widget content() {
     if (withPaddingHor) {
       return Padding(
@@ -23,15 +25,10 @@ class CenterColumnContainer extends StatelessWidget {
 
   Widget contentBasedOnParam() {
     if (isVerticallyCentered) {
-      return LayoutBuilder(
-        builder: (context, constraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: content(),
-            ),
-          );
-        },
+      return Center(
+        child: SingleChildScrollView(
+          child: content(),
+        ),
       );
     } else {
       return SingleChildScrollView(

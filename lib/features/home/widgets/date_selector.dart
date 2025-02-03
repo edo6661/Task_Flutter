@@ -42,16 +42,26 @@ class _DateSelectorState extends State<DateSelector> {
     return Column(
       spacing: 4,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-                onPressed: onBackWeek, icon: const Icon(Icons.arrow_back_ios)),
-            MainText(text: monthName, extent: Medium()),
-            IconButton(
-                onPressed: onForwardWeek,
-                icon: const Icon(Icons.arrow_forward_ios))
-          ],
+        GestureDetector(
+          onHorizontalDragEnd: (DragEndDetails details) {
+            if (details.primaryVelocity! > 0) {
+              onBackWeek();
+            } else if (details.primaryVelocity! < 0) {
+              onForwardWeek();
+            }
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                  onPressed: onBackWeek,
+                  icon: const Icon(Icons.arrow_back_ios)),
+              MainText(text: monthName, extent: Medium()),
+              IconButton(
+                  onPressed: onForwardWeek,
+                  icon: const Icon(Icons.arrow_forward_ios)),
+            ],
+          ),
         ),
         SizedBox(
           // so the listview will not take the whole screen

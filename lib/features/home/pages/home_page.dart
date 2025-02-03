@@ -41,7 +41,9 @@ class _HomePageState extends State<HomePage> {
     connectivitySubscription =
         Connectivity().onConnectivityChanged.listen((data) async {
       if (mounted) {
-        if (data.contains(ConnectivityResult.wifi)) {
+        if (data.contains(ConnectivityResult.wifi) ||
+            data.contains(ConnectivityResult.mobile) ||
+            data.contains(ConnectivityResult.ethernet)) {
           await context.read<TasksCubit>().syncTasks();
         }
       }
@@ -106,12 +108,10 @@ class _HomePageState extends State<HomePage> {
               return CenterCircularLoading();
             }
             if (state is TasksFailed) {
-              return CenterColumnContainer(
-                child: MainText(
-                  text: state.message,
-                  extent: Large(),
-                  maxLines: 100,
-                ),
+              return MainText(
+                text: state.message,
+                extent: Large(),
+                maxLines: 100,
               );
             }
             if (state is TasksGetSuccess) {
@@ -124,7 +124,7 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   children: [
-                    Expanded(child: _buildTaskList(tasksByDate)),
+                    Expanded(child: _buildTaskList(tasksByDate, state.tasks)),
                   ],
                 ),
               );
@@ -138,14 +138,16 @@ class _HomePageState extends State<HomePage> {
     return SliverToBoxAdapter(child: EmptyData(title: "No Task Available"));
   }
 
-  Widget _buildTaskList(List<TaskModel> tasks) {
+  Widget _buildTaskList(List<TaskModel> filteredTask, List<TaskModel> tasks) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
-      child: _buildTasks(tasks, context, context.read<TasksCubit>()),
+      child:
+          _buildTasks(filteredTask, tasks, context, context.read<TasksCubit>()),
     );
   }
 
   Widget _buildTasks(
+    List<TaskModel> filteredTasks,
     List<TaskModel> tasks,
     BuildContext context,
     TasksCubit tasksCubit,
@@ -169,9 +171,9 @@ class _HomePageState extends State<HomePage> {
         const SliverPadding(
           padding: EdgeInsets.only(top: 16),
         ),
-        tasks.isEmpty
+        filteredTasks.isEmpty
             ? _buildEmptyTask()
-            : _buildTask(tasks, context, tasksCubit),
+            : _buildTask(filteredTasks, context, tasksCubit),
       ],
     );
   }
